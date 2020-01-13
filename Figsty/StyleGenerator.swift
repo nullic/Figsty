@@ -36,7 +36,7 @@ class StyleGenerator {
         var strings: [String] = []
         strings.append(iOSSwiftFilePrefix)
 
-        let structName = file.name.escaped.capitalizedFirstLetter
+        let structName = output.deletingPathExtension().lastPathComponent.escaped.capitalizedFirstLetter
         strings.append("public struct \(structName) {")
         for color in colors {
             let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter

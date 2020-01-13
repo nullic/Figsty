@@ -75,6 +75,10 @@ class StyleGenerator {
         for color in colors {
             strings.append("\(indent)public let \(colorName(color)) = \(color.color.uiColor)")
         }
+
+        strings.append("")
+        strings.append("public init() {}")
+        strings.append("")
         strings.append("}")
 
         let text = strings.joined(separator: "\n")

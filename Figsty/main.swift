@@ -19,6 +19,7 @@ do {
     var ios_output_file: String?
     var ios_scheme_output_file: String?
     var color_prefix: String?
+    var trim_ending_digits: Bool = false
 
     var key: String?
     for (index, arg) in CommandLine.arguments.enumerated() {
@@ -28,7 +29,10 @@ do {
             figma_file_key = arg
             continue
         } else if key == nil {
-            key = arg
+            switch arg {
+            case "-ted": trim_ending_digits = true
+            default: key = arg
+            }
         } else {
             switch key {
             case "-a": personal_access_tokens = arg
@@ -67,31 +71,36 @@ do {
     guard let file = response else { exit(-1) }
 
     let generator = StyleGenerator(file: file)
+    generator.colorPrefix = color_prefix ?? ""
+    generator.iosStructSupportScheme = ios_scheme_output_file != nil
+    generator.trimEndingDigits = trim_ending_digits
+
     if let file = andoid_output_file {
         let output = file.absoluteFileURL(baseURL: homeDir)
-        try generator.generateAndroid(output: output, prefix: color_prefix)
+        try generator.generateAndroid(output: output)
         print("Generate: \(output.path)")
     }
 
     if let file = ios_output_file {
         let output = file.absoluteFileURL(baseURL: homeDir)
-        try generator.generateIOS(output: output, prefix: color_prefix, supportScheme: ios_scheme_output_file != nil)
+        try generator.generateIOS(output: output)
         print("Generate: \(output.path)")
     }
 
     if let file = ios_scheme_output_file {
         let output = file.absoluteFileURL(baseURL: homeDir)
-        try generator.generateIOSSheme(output: output, prefix: color_prefix)
+        try generator.generateIOSSheme(output: output)
         print("Generate: \(output.path)")
     }
 } catch {
     print(error)
     print("\n\nUsage example:")
-    print("\t\(appName) figma_file_key -a personal_access_token")
+    print("\t\(appName) figma_file_key -a personal_access_token -tn -oi \"./Colors.swift\"")
     print("\nOptions:")
     print("\ta: Figma personal access token")
     print("\toa: Andoid Output file")
     print("\toi: iOS Output file")
     print("\tois: iOS 'ColorScheme' Output file")
     print("\tprefix: Generated Color Prefix")
+    print("\tted: Trim ending digits")
 }

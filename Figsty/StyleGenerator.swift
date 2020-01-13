@@ -10,7 +10,16 @@ import Foundation
 
 class StyleGenerator {
     let file: File
-    private(set) var colors: [ColorStyle]!
+    private var colors: [ColorStyle]!
+    private var trimmedNamesCount: [String: Int] = [:]
+
+    var trimEndingDigits: Bool = false
+    var iosStructSupportScheme: Bool = false
+    var colorPrefix: String = "" {
+        didSet {
+            regenerateTrimMap()
+        }
+    }
 
     init(file: File) {
         self.file = file
@@ -29,19 +38,42 @@ class StyleGenerator {
             }
         }
         colors.sort { $0.style.name < $1.style.name }
+        regenerateTrimMap()
     }
 
-    func generateIOS(output: URL, prefix: String?, supportScheme: Bool) throws {
+    private func regenerateTrimMap() {
+        guard colors != nil else {
+            trimmedNamesCount = [:]
+            return
+        }
+
+        var resultMap: [String: Int] = [:]
+        for color in colors {
+            let name = (colorPrefix + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter.trimmingCharacters(in: .decimalDigits)
+            resultMap[name] = (resultMap[name] ?? 0) + 1
+        }
+
+        trimmedNamesCount = resultMap
+    }
+
+    private func colorName(_ style: ColorStyle) -> String {
+        let name = (colorPrefix + style.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
+        guard trimEndingDigits == true else { return name }
+
+        let trimmedName = name.trimmingCharacters(in: .decimalDigits)
+        return trimmedNamesCount[trimmedName] == 1 ? trimmedName : name
+    }
+
+    func generateIOS(output: URL) throws {
         process()
         var strings: [String] = []
         strings.append(iOSSwiftFilePrefix)
 
         let structName = output.deletingPathExtension().lastPathComponent.escaped.capitalizedFirstLetter
-        let ext = supportScheme ? ": ColorScheme" : ""
+        let ext = iosStructSupportScheme ? ": ColorScheme" : ""
         strings.append("public struct \(structName)\(ext) {")
         for color in colors {
-            let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
-            strings.append("\(indent)public let \(colorName) = \(color.color.uiColor)")
+            strings.append("\(indent)public let \(colorName(color)) = \(color.color.uiColor)")
         }
         strings.append("}")
 
@@ -49,23 +81,21 @@ class StyleGenerator {
         try save(text: text, to: output)
     }
 
-    func generateIOSSheme(output: URL, prefix: String?) throws {
+    func generateIOSSheme(output: URL) throws {
         process()
         var strings: [String] = []
         strings.append(iOSSwiftFilePrefix)
 
         strings.append("public protocol ColorScheme {")
         for color in colors {
-            let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
             strings.append("\(indent)/// \(color.style.name)")
-            strings.append("\(indent)var \(colorName): UIColor { get }")
+            strings.append("\(indent)var \(colorName(color)): UIColor { get }")
         }
         strings.append("}\n")
 
         strings.append("public enum ColorName: String {")
         for color in colors {
-            let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
-            strings.append("\(indent)case \(colorName)")
+            strings.append("\(indent)case \(colorName(color))")
         }
         strings.append("}\n")
 
@@ -73,8 +103,7 @@ class StyleGenerator {
         strings.append("\(indent)public subscript(colorName: ColorName) -> UIColor {")
         strings.append("\(indent)\(indent)switch colorName {")
         for color in colors {
-            let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
-            strings.append("\(indent)\(indent)case .\(colorName): return \(colorName)")
+            strings.append("\(indent)\(indent)case .\(colorName(color)): return \(colorName(color))")
         }
         strings.append("\(indent)\(indent)}")
         strings.append("\(indent)}")
@@ -84,15 +113,14 @@ class StyleGenerator {
         try save(text: text, to: output)
     }
 
-    func generateAndroid(output: URL, prefix: String?) throws {
+    func generateAndroid(output: URL) throws {
         process()
         var strings: [String] = []
 
         strings.append(androidFilePrefix)
         for color in colors {
-            let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
             strings.append("\(indent)<!--\(color.style.name)-->")
-            strings.append("\(indent)<color name=\"\(colorName)\">\(color.color.androidHexColor)</color>")
+            strings.append("\(indent)<color name=\"\(colorName(color))\">\(color.color.androidHexColor)</color>")
         }
         strings.append(androidFileSuffix)
 

@@ -37,18 +37,13 @@ class StyleGenerator {
         strings.append(iOSSwiftFilePrefix)
 
         let structName = output.deletingPathExtension().lastPathComponent.escaped.capitalizedFirstLetter
-        strings.append("public struct \(structName) {")
+        let ext = supportScheme ? ": ColorScheme" : ""
+        strings.append("public struct \(structName)\(ext) {")
         for color in colors {
             let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
             strings.append("\(indent)let \(colorName) = \(color.color.uiColor)")
         }
         strings.append("}")
-
-        if supportScheme == true {
-            strings.append("")
-            strings.append("public extension \(structName): ColorScheme {")
-            strings.append("}")
-        }
 
         let text = strings.joined(separator: "\n")
         try save(text: text, to: output)

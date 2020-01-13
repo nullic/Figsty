@@ -77,7 +77,7 @@ class StyleGenerator {
         }
 
         strings.append("")
-        strings.append("public init() {}")
+        strings.append("\(indent)public init() {}")
         strings.append("")
         strings.append("}")
 

@@ -78,7 +78,6 @@ class StyleGenerator {
 
         strings.append("")
         strings.append("\(indent)public init() {}")
-        strings.append("")
         strings.append("}")
 
         let text = strings.joined(separator: "\n")

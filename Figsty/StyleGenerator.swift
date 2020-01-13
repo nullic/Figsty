@@ -41,7 +41,7 @@ class StyleGenerator {
         strings.append("public struct \(structName)\(ext) {")
         for color in colors {
             let colorName = ((prefix ?? "") + color.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
-            strings.append("\(indent)let \(colorName) = \(color.color.uiColor)")
+            strings.append("\(indent)public let \(colorName) = \(color.color.uiColor)")
         }
         strings.append("}")
 

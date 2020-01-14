@@ -13,6 +13,11 @@ extension File {
         let node = document.nodeWith(styleID: styleID)
         return node?.fills?.first?.fixedOpacityColor
     }
+
+    func findFont(styleID: String) -> TypeStyle? {
+        let node = document.nodeWith(styleID: styleID)
+        return node?.style
+    }
 }
 
 extension Node {
@@ -64,6 +69,42 @@ extension Color {
 
     var uiColor: String {
         return "UIColor(red: \(Float(r)), green: \(Float(g)), blue: \(Float(b)), alpha: \(Float(a)))"
+    }
+}
+
+extension TypeStyle {
+    enum Weight: Int {
+        case thin = 100 // Thin (Hairline)
+        case extraLight = 200 // Extra Light (Ultra Light)
+        case light = 300 // Light
+        case normal = 400 // Normal (Regular)
+        case medium = 500 // Medium
+        case semiBold = 600 // Semi Bold (Demi Bold)
+        case bold = 700 // Bold
+        case extraBold = 800 // Extra Bold (Ultra Bold)
+        case black = 900 // Black (Heavy)
+
+        var iosName: String {
+            switch self {
+            case .thin: return "ultraLight"
+            case .extraLight: return "thin"
+            case .light: return "light"
+            case .normal: return "regular"
+            case .medium: return "medium"
+            case .semiBold: return "semibold"
+            case .bold: return "bold"
+            case .extraBold: return "heavy"
+            case .black: return "black"
+            }
+        }
+    }
+
+    var estimatedWeight: Weight {
+        return Weight(rawValue: Int(fontWeight))!
+    }
+
+    var uiFontSystem: String {
+        return "UIFont.systemFont(ofSize: \(fontSize), weight: .\(estimatedWeight.iosName))"
     }
 }
 

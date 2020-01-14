@@ -21,6 +21,15 @@ struct ColorStyle: CustomStringConvertible {
     let color: Color
 }
 
+struct FontStyle: CustomStringConvertible {
+    var description: String {
+        return "\(style.name): \(typeStyle.uiFontSystem)"
+    }
+
+    let style: Style
+    let typeStyle: TypeStyle
+}
+
 // MARK: - Predefined strings
 
 let indent = "    "

@@ -11,6 +11,7 @@ import Foundation
 class StyleGenerator {
     let file: File
     private var colors: [ColorStyle]!
+    private var fonts: [FontStyle]!
     private var trimmedNamesCount: [String: Int] = [:]
 
     var trimEndingDigits: Bool = false
@@ -38,6 +39,16 @@ class StyleGenerator {
             }
         }
         colors.sort { $0.style.name < $1.style.name }
+
+        fonts = file.styles.compactMap { (key: String, value: Style) -> FontStyle? in
+            if let font = file.findFont(styleID: key) {
+                return FontStyle(style: value, typeStyle: font)
+            } else {
+                return nil
+            }
+        }
+        fonts.sort { $0.style.name < $1.style.name }
+
         regenerateTrimMap()
     }
 
@@ -62,6 +73,9 @@ class StyleGenerator {
 
         let trimmedName = name.trimmingCharacters(in: .decimalDigits)
         return trimmedNamesCount[trimmedName] == 1 ? trimmedName : name
+    }
+
+    func generateIOSFonts(output: URL) throws {
     }
 
     func generateIOS(output: URL) throws {

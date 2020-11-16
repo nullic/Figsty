@@ -70,6 +70,10 @@ extension Color {
     var uiColor: String {
         return "UIColor(red: \(Float(r)), green: \(Float(g)), blue: \(Float(b)), alpha: \(Float(a)))"
     }
+    
+    var colorspaceUIColor: String {
+        return "UIColor(cgColor: CGColor(colorSpace: CGColorSpace(name: CGColorSpace.extendedSRGB)!, components: [\(Float(r)), \(Float(g)), \(Float(b)), \(Float(a))])!)"
+    }
 }
 
 extension TypeStyle {

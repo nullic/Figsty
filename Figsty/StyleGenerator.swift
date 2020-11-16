@@ -16,6 +16,7 @@ class StyleGenerator {
 
     var trimEndingDigits: Bool = false
     var iosStructSupportScheme: Bool = false
+    var useExtendedSRGBColorspace: Bool = false
     var colorPrefix: String = "" {
         didSet {
             regenerateTrimMap()
@@ -87,7 +88,7 @@ class StyleGenerator {
         let ext = iosStructSupportScheme ? ": ColorScheme" : ""
         strings.append("public struct \(structName)\(ext) {")
         for color in colors {
-            strings.append("\(indent)public let \(colorName(color)) = \(color.color.uiColor)")
+            strings.append("\(indent)public let \(colorName(color)) = \(useExtendedSRGBColorspace ? color.color.colorspaceUIColor : color.color.uiColor )")
         }
 
         strings.append("")

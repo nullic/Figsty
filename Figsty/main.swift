@@ -20,6 +20,7 @@ do {
     var ios_scheme_output_file: String?
     var color_prefix: String?
     var trim_ending_digits: Bool = false
+    var use_extended_srgb_colorspace: Bool = false
 
     var key: String?
     for (index, arg) in CommandLine.arguments.enumerated() {
@@ -31,6 +32,7 @@ do {
         } else if key == nil {
             switch arg {
             case "-ted": trim_ending_digits = true
+            case "-exsrgb": use_extended_srgb_colorspace = true
             default: key = arg
             }
         } else {
@@ -74,6 +76,7 @@ do {
     generator.colorPrefix = color_prefix ?? ""
     generator.iosStructSupportScheme = ios_scheme_output_file != nil
     generator.trimEndingDigits = trim_ending_digits
+    generator.useExtendedSRGBColorspace = use_extended_srgb_colorspace
 
     if let file = andoid_output_file {
         let output = file.absoluteFileURL(baseURL: homeDir)
@@ -103,4 +106,5 @@ do {
     print("\tois: iOS 'ColorScheme' Output file")
     print("\tprefix: Generated Color Prefix")
     print("\tted: Trim ending digits")
+    print("\texsrgb: Use extended sRGB color space (iOS)")
 }

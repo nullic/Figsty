@@ -8,10 +8,6 @@
 
 import Foundation
 
-enum CLIError: Error {
-    case invalidArguments
-}
-
 struct ColorStyle: CustomStringConvertible {
     var description: String {
         return "\(style.name): \(color.androidHexColor)"

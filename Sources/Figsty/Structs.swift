@@ -14,6 +14,7 @@ struct File: Codable {
     let document: Node
 
     let styles: [String: Style]
+    let components: [String: Component]
 }
 
 struct Node: Codable {
@@ -29,6 +30,8 @@ struct Node: Codable {
     let styles: [String: String]?
 
     let fills: [Paint]?
+    
+    let componentId: String?
 }
 
 struct Color: Codable {
@@ -45,6 +48,12 @@ struct Style: Codable {
     let description: String?
 }
 
+struct Component: Codable {
+    let key: String
+    let name: String
+    let description: String?
+}
+
 struct TypeStyle: Codable {
     let fontFamily: String
     let fontWeight: Double
@@ -55,4 +64,9 @@ struct Paint: Codable {
     let type: PaintType
     let color: Color?
     let opacity: Double?
+}
+
+struct DownloadLinksInfo: Codable {
+    let err: String?
+    let images: [String: String?]
 }

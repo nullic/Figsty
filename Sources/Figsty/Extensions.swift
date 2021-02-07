@@ -8,6 +8,14 @@
 
 import Foundation
 
+extension Array where Element == String {
+    static func csv(_ string: String?) -> [String]? {
+        guard let string = string else { return nil }
+        return string.components(separatedBy: ",").map({ $0.trimmingCharacters(in: .whitespacesAndNewlines)})
+    }
+}
+
+typealias NameComponent = String
 extension File {
     func findColor(styleID: String) -> Color? {
         let node = document.nodeWith(styleID: styleID)
@@ -17,6 +25,12 @@ extension File {
     func findFont(styleID: String) -> TypeStyle? {
         let node = document.nodeWith(styleID: styleID)
         return node?.style
+    }
+    
+    func findComponent(componentID: String) -> (Node, [NameComponent])? {
+        guard let pair = document.findWith(componentID: componentID) else { return nil }
+        let components = Array(pair.1.dropFirst())
+        return (pair.0, components)
     }
 }
 
@@ -33,6 +47,21 @@ extension Node {
                 }
             }
             return result
+        }
+    }
+    
+    func findWith(componentID id: String) -> (Node, [NameComponent])? {
+        if componentId == id {
+            return (self, [name])
+        } else {
+            for ch in children ?? [] {
+                if let pair = ch.findWith(componentID: id) {
+                    var components = pair.1
+                    components.insert(name, at: 0)
+                    return (pair.0, components)
+                }
+            }
+            return nil
         }
     }
 }

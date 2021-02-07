@@ -40,28 +40,25 @@ struct Figsty: ParsableCommand {
     @Flag(name: .customLong("use-srgb"), help: "Use extended sRGB color space (iOS)")
     var use_extended_srgb_colorspace: Bool = false
     
+    @Option(name: .customLong("ios-icons-output"), parsing: .next, help: "iOS Icon Output Folder (.xcassets)")
+    var ios_icons_output_folder: String?
+    
+    @Flag(name: .customLong("icons-template"), help: "Use icons as template")
+    var icons_as_template: Bool = false
+    
+    @Option(name: .customLong("doc-paths"), parsing: .next, help: "Comma separated document related paths for parsing", transform: [String].csv)
+    var doc_paths: [String]?
+    
+    @Flag(name: .customLong("drop-canva-name"), help: "Drop canva name in output")
+    var drop_canva_name: Bool = false
+    
+    @Flag(name: .customLong("absolute-bounds"), help: "Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping.")
+    var use_absolute_bounds: Bool = false
+    
+    
     func run() throws {
-        var request = URLRequest(url: URL(string: "https://api.figma.com/v1/files/\(figma_file_key)/")!)
-        request.httpMethod = "GET"
-        if let personal_access_tokens = personal_access_tokens {
-            request.addValue(personal_access_tokens, forHTTPHeaderField: "X-Figma-Token")
-        }
-
-        let semaphore = DispatchSemaphore(value: 0)
-        var response: File!
-        var responseError: Error?
-        URLSession(configuration: .default).dataTask(with: request) { (data, _, error) in
-            do {
-                guard error == nil, let data = data else { throw error! }
-                response = try JSONDecoder().decode(File.self, from: data)
-            } catch {
-                responseError = error
-            }
-            semaphore.signal()
-        }.resume()
-        semaphore.wait()
-
-        guard let file = response else { throw responseError! }
+        let fileURL = URL(string: "https://api.figma.com/v1/files/\(figma_file_key)/")!
+        let file: File = try URLSession.getData(at: fileURL, figmaToken: personal_access_tokens)
 
         let generator = StyleGenerator(file: file)
         generator.colorPrefix = color_prefix ?? ""
@@ -85,6 +82,16 @@ struct Figsty: ParsableCommand {
             let output = file.absoluteFileURL(baseURL: homeDir)
             try generator.generateIOSSheme(output: output)
             print("Generate: \(output.path)")
+        }
+        
+        if let folder = ios_icons_output_folder {
+            let output = folder.absoluteFileURL(baseURL: homeDir)
+            let downloaded = IconDownloader(file: file, fileKey: figma_file_key, accessToken: personal_access_tokens)
+            downloaded.docPaths = doc_paths
+            downloaded.dropCanvaName = drop_canva_name
+            downloaded.iconsAsTemplate = icons_as_template
+            downloaded.useAbsoluteBounds = use_absolute_bounds
+            try downloaded.downloadPDFs(output: output)
         }
     }
 }

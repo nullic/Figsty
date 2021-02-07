@@ -51,3 +51,54 @@ import Foundation
 import UIKit
 
 """
+
+// Contents.json
+let assetCatalogFolderJSON = """
+{
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "provides-namespace" : true
+  }
+}
+"""
+
+// Contents.json
+let iconAssetJSONTemplate = """
+{
+  "images" : [
+    {
+      "filename" : "%@",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "template"
+  }
+}
+"""
+
+// Contents.json
+let iconAssetJSONOriginal = """
+{
+  "images" : [
+    {
+      "filename" : "%@",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  },
+  "properties" : {
+    "template-rendering-intent" : "original"
+  }
+}
+"""

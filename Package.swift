@@ -7,7 +7,7 @@ let package = Package(
         .executable(name: "figsty", targets: ["Figsty"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMajor(from: "0.0.0")),
+        .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMajor(from: "1.0.0")),
     ],
     targets: [
         .target(name: "Figsty",

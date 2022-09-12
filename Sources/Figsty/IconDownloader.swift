@@ -73,7 +73,7 @@ final class IconDownloader {
             URLQueryItem(name: "ids", value: ids.joined(separator: ",")),
         ]
         
-        return try URLSession.getData(at: components.url!, figmaToken: accessToken)
+        return try URLSession.getData(at: components.url!, figmaToken: accessToken, cachePath: nil)
     }
     
     private func downloadMissedPDFs(links: DownloadLinksInfo) throws {

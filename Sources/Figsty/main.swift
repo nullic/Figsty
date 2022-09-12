@@ -55,10 +55,12 @@ struct Figsty: ParsableCommand {
     @Flag(name: .customLong("absolute-bounds"), help: "Use the full dimensions of the node regardless of whether or not it is cropped or the space around it is empty. Use this to export text nodes without cropping.")
     var use_absolute_bounds: Bool = false
     
+    @Option(name: .customLong("cache-path"), parsing: .next, help: "Downloaded JSON cache path")
+    var cache_path: String?
     
     func run() throws {
         let fileURL = URL(string: "https://api.figma.com/v1/files/\(figma_file_key)/")!
-        let file: File = try URLSession.getData(at: fileURL, figmaToken: personal_access_tokens)
+        let file: File = try URLSession.getData(at: fileURL, figmaToken: personal_access_tokens, cachePath: cache_path?.absoluteFileURL(baseURL: homeDir))
 
         let generator = StyleGenerator(file: file)
         generator.colorPrefix = color_prefix ?? ""

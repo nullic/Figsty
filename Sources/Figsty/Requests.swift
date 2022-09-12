@@ -8,7 +8,7 @@
 import Foundation
 
 extension URLSession  {
-    class func getData<T: Codable>(at url: URL, figmaToken: String?) throws -> T {
+    class func getData<T: Codable>(at url: URL, figmaToken: String?, cachePath: URL?) throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         if let figmaToken = figmaToken {
@@ -18,16 +18,26 @@ extension URLSession  {
         let semaphore = DispatchSemaphore(value: 0)
         var response: T!
         var resultError: Error?
-        URLSession(configuration: .default).dataTask(with: request) { (data, _, error) in
-            do {
-                guard error == nil, let data = data else { throw error! }
-                response = try JSONDecoder().decode(T.self, from: data)
-            } catch {
-                resultError = error
-            }
-            semaphore.signal()
-        }.resume()
-        semaphore.wait()
+        
+        if let cachePath = cachePath, let data = try? Data(contentsOf: cachePath) {
+            response = try JSONDecoder().decode(T.self, from: data)
+        }
+        else {
+            URLSession(configuration: .default).dataTask(with: request) { (data, _, error) in
+                do {
+                    guard error == nil, let data = data else { throw error! }
+                    if let cachePath = cachePath {
+                        try data.write(to: cachePath)
+                        print("Save response: \(cachePath.path)")
+                    }
+                    response = try JSONDecoder().decode(T.self, from: data)
+                } catch {
+                    resultError = error
+                }
+                semaphore.signal()
+            }.resume()
+            semaphore.wait()
+        }
 
         guard let data = response else { throw resultError! }
         return data

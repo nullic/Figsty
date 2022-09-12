@@ -23,6 +23,7 @@ enum NodeType: String, Codable {
     case TEXT
     case SLICE
     case COMPONENT
+    case COMPONENT_SET
     case INSTANCE
 }
 

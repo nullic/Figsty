@@ -6,9 +6,8 @@
 //  Copyright © 2020 Dmitriy Petrusevich. All rights reserved.
 //
 
-
-import Foundation
 import ArgumentParser
+import Foundation
 
 final class IconDownloader {
     let file: File
@@ -18,9 +17,9 @@ final class IconDownloader {
     var dropCanvaName: Bool = false
     var iconsAsTemplate: Bool = false
     var useAbsoluteBounds: Bool = false
-
-    private var missedAssets: [URL: Node] = [:]  // key: destination, value: component
-
+    
+    private var missedAssets: [URL: Node] = [:] // key: destination, value: component
+    
     init(file: File, fileKey: String, accessToken: String?) {
         self.file = file
         self.fileKey = fileKey

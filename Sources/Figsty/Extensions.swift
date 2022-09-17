@@ -11,7 +11,7 @@ import Foundation
 extension Array where Element == String {
     static func csv(_ string: String?) -> [String]? {
         guard let string = string else { return nil }
-        return string.components(separatedBy: ",").map({ $0.trimmingCharacters(in: .whitespacesAndNewlines)})
+        return string.components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
     }
 }
 
@@ -81,7 +81,7 @@ extension Color {
         let g = Int(min(255, max(0, round(self.g * 255))))
         let b = Int(min(255, max(0, round(self.b * 255))))
         let a = Int(min(255, max(0, round(self.a * 255))))
-        return String(format:"#%02X%02X%02X%02X", a, r, g, b)
+        return String(format: "#%02X%02X%02X%02X", a, r, g, b)
     }
 
     var rgba255: String {
@@ -146,7 +146,7 @@ extension TypeStyle {
 extension String {
     func absoluteFileURL(baseURL: URL) -> URL {
         if hasPrefix("./") {
-            return baseURL.appendingPathComponent(String(self.dropFirst().dropFirst()))
+            return baseURL.appendingPathComponent(String(dropFirst().dropFirst()))
         } else {
             return URL(fileURLWithPath: self)
         }
@@ -155,17 +155,17 @@ extension String {
     static let trimSet = CharacterSet.punctuationCharacters.union(.decimalDigits).union(.whitespacesAndNewlines)
 
     var escaped: String {
-        let edited  = self + "S"
+        let edited = self + "S"
         return edited.trimmingCharacters(in: String.trimSet).dropLast().filter { $0.isLetter || $0.isNumber || $0 == "_" }
     }
 
     var capitalizedFirstLetter: String {
-        guard self.isEmpty == false else { return self }
-        return self.prefix(1).uppercased() + self.dropFirst()
+        guard isEmpty == false else { return self }
+        return prefix(1).uppercased() + dropFirst()
     }
 
     var loweredFirstLetter: String {
-        guard self.isEmpty == false else { return self }
-        return self.prefix(1).lowercased() + self.dropFirst()
+        guard isEmpty == false else { return self }
+        return prefix(1).lowercased() + dropFirst()
     }
 }

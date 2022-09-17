@@ -6,9 +6,8 @@
 //  Copyright © 2020 Dmitriy Petrusevich. All rights reserved.
 //
 
-import Foundation
 import ArgumentParser
-
+import Foundation
 
 private let launchURL = URL(fileURLWithPath: CommandLine.arguments[0])
 private let homeDir = launchURL.deletingLastPathComponent()
@@ -42,6 +41,9 @@ struct Figsty: ParsableCommand {
     
     @Option(name: .customLong("ios-icons-output"), parsing: .next, help: "iOS Icon Output Folder (.xcassets)")
     var ios_icons_output_folder: String?
+    
+    @Option(name: .customLong("ios-typo-output"), parsing: .next, help: "iOS Fonts Output File")
+    var ios_typo_output: String?
     
     @Flag(name: .customLong("icons-template"), help: "Use icons as template")
     var icons_as_template: Bool = false
@@ -83,6 +85,12 @@ struct Figsty: ParsableCommand {
         if let file = ios_scheme_output_file {
             let output = file.absoluteFileURL(baseURL: homeDir)
             try generator.generateIOSSheme(output: output)
+            print("Generate: \(output.path)")
+        }
+        
+        if let file = ios_typo_output {
+            let output = file.absoluteFileURL(baseURL: homeDir)
+            try generator.generateIOSFonts(output: output)
             print("Generate: \(output.path)")
         }
         

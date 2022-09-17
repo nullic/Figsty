@@ -12,7 +12,7 @@ class StyleGenerator {
     let file: File
     private var colors: [ColorStyle]!
     private var fonts: [FontStyle]!
-    private var trimmedNamesCount: [String: Int] = [:]
+    private var trimmedColorNamesCount: [String: Int] = [:]
 
     var trimEndingDigits: Bool = false
     var iosStructSupportScheme: Bool = false
@@ -55,7 +55,7 @@ class StyleGenerator {
 
     private func regenerateTrimMap() {
         guard colors != nil else {
-            trimmedNamesCount = [:]
+            trimmedColorNamesCount = [:]
             return
         }
 
@@ -65,7 +65,7 @@ class StyleGenerator {
             resultMap[name] = (resultMap[name] ?? 0) + 1
         }
 
-        trimmedNamesCount = resultMap
+        trimmedColorNamesCount = resultMap
     }
 
     private func colorName(_ style: ColorStyle) -> String {
@@ -73,10 +73,31 @@ class StyleGenerator {
         guard trimEndingDigits == true else { return name }
 
         let trimmedName = name.trimmingCharacters(in: .decimalDigits)
-        return trimmedNamesCount[trimmedName] == 1 ? trimmedName : name
+        return trimmedColorNamesCount[trimmedName] == 1 ? trimmedName : name
+    }
+
+    private func fontName(_ style: FontStyle) -> String {
+        let name = (style.style.name.escaped.capitalizedFirstLetter).loweredFirstLetter
+        guard trimEndingDigits == true else { return name }
+
+        let trimmedName = name.trimmingCharacters(in: .decimalDigits)
+        return trimmedColorNamesCount[trimmedName] == 1 ? trimmedName : name
     }
 
     func generateIOSFonts(output: URL) throws {
+        process()
+        var strings: [String] = []
+        strings.append(iOSSwiftFilePrefix)
+
+        strings.append("public extension UIFont {")
+        for font in fonts where font.style.styleType == .TEXT {
+            strings.append("\(indent)// \(font.style.name)")
+            strings.append("\(indent)static let \(fontName(font)) = \(font.typeStyle.uiFontSystem)")
+        }
+        strings.append("}\n")
+
+        let text = strings.joined(separator: "\n")
+        try save(text: text, to: output)
     }
 
     func generateIOS(output: URL) throws {
@@ -88,7 +109,7 @@ class StyleGenerator {
         let ext = iosStructSupportScheme ? ": ColorScheme" : ""
         strings.append("public struct \(structName)\(ext) {")
         for color in colors {
-            strings.append("\(indent)public let \(colorName(color)) = \(useExtendedSRGBColorspace ? color.color.colorspaceUIColor : color.color.uiColor )")
+            strings.append("\(indent)public let \(colorName(color)) = \(useExtendedSRGBColorspace ? color.color.colorspaceUIColor : color.color.uiColor)")
         }
 
         strings.append("")

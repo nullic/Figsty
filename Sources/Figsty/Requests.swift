@@ -1,13 +1,13 @@
 //
 //  File.swift
-//  
+//
 //
 //  Created by Dmitriy Petrusevich on 7.02.21.
 //
 
 import Foundation
 
-extension URLSession  {
+extension URLSession {
     class func getData<T: Codable>(at url: URL, figmaToken: String?, cachePath: URL?) throws -> T {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -21,9 +21,8 @@ extension URLSession  {
         
         if let cachePath = cachePath, let data = try? Data(contentsOf: cachePath) {
             response = try JSONDecoder().decode(T.self, from: data)
-        }
-        else {
-            URLSession(configuration: .default).dataTask(with: request) { (data, _, error) in
+        } else {
+            URLSession(configuration: .default).dataTask(with: request) { data, _, error in
                 do {
                     guard error == nil, let data = data else { throw error! }
                     if let cachePath = cachePath {
@@ -46,8 +45,8 @@ extension URLSession  {
     class func download(file sourceURL: URL, to destinationURL: URL) throws {
         let semaphore = DispatchSemaphore(value: 0)
         var resultError: Error?
-        
-        URLSession(configuration: .default).downloadTask(with: sourceURL) { (tempURL, _, error) in
+
+        URLSession(configuration: .default).downloadTask(with: sourceURL) { tempURL, _, error in
             do {
                 guard error == nil, let tempURL = tempURL else { throw error! }
                 

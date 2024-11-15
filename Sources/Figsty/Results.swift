@@ -15,6 +15,7 @@ struct ColorStyle: CustomStringConvertible {
 
     let style: Style
     let color: Color
+    let parentName: String
 }
 
 struct FontStyle: CustomStringConvertible {

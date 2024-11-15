@@ -34,6 +34,13 @@ extension File {
     }
 }
 
+extension Style {
+    func withTrimmedPrexixName(prefix: String) -> Style {
+        let name = name.replacingOccurrences(of: "\(prefix)/", with: "")
+        return .init(key: key, name: name, styleType: styleType, description: description)
+    }
+}
+
 extension Node {
     func nodeWith(styleID id: String) -> Node? {
         if styles?.values.contains(id) == true {

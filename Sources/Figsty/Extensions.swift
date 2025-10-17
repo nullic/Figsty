@@ -103,6 +103,31 @@ extension Color {
     var colorspaceUIColor: String {
         return "UIColor(cgColor: CGColor(colorSpace: CGColorSpace(name: CGColorSpace.extendedSRGB)!, components: [\(Float(r)), \(Float(g)), \(Float(b)), \(Float(a))])!)"
     }
+    
+    var xcassetsData: String {
+        """
+        {
+          "colors" : [
+            {
+              "color" : {
+                "color-space" : "srgb",
+                "components" : {
+                  "alpha" : "\(a)",
+                  "blue" : "\(b.hexString)",
+                  "green" : "\(g.hexString)",
+                  "red" : "\(r.hexString)"
+                }
+              },
+              "idiom" : "universal"
+            }
+          ],
+          "info" : {
+            "author" : "xcode",
+            "version" : 1
+          }
+        }
+        """
+    }
 }
 
 extension TypeStyle {
@@ -167,5 +192,15 @@ extension String {
     var loweredFirstLetter: String {
         guard isEmpty == false else { return self }
         return prefix(1).lowercased() + dropFirst()
+    }
+}
+
+// MARK: -
+
+extension Double {
+    var hexString: String {
+        let double = (self * 255).rounded()
+        let value = Int(min(255, max(0, double)))
+        return String(format: "0x%02X", value)
     }
 }

@@ -102,22 +102,47 @@ class StyleGenerator {
 
     func generateIOS(output: URL) throws {
         process()
-        var strings: [String] = []
-        strings.append(iOSSwiftFilePrefix)
+        if output.pathExtension.lowercased() == "xcassets" {
+            try? FileManager.default.createDirectory(at: output, withIntermediateDirectories: true, attributes: nil)
+            let fillColors = colors.filter { $0.style.styleType == .FILL }
+            
+            for color in fillColors {
+                let comps = color.style.name.components(separatedBy: "/").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+                let name = comps.joined(separator: "/")
 
-        let structName = output.deletingPathExtension().lastPathComponent.escaped.capitalizedFirstLetter
-        let ext = iosStructSupportScheme ? ": ColorScheme" : ""
-        strings.append("public struct \(structName)\(ext) {")
-        for color in colors {
-            strings.append("\(indent)public let \(colorName(color)) = \(useExtendedSRGBColorspace ? color.color.colorspaceUIColor : color.color.uiColor)")
+                let colorset = output.appending(path: name).appendingPathExtension("colorset")
+                let contents = colorset.appending(path: "Contents.json")
+                
+                do {
+                    if FileManager.default.fileExists(atPath: colorset.path) {
+                        try FileManager.default.removeItem(at: colorset)
+                    }
+
+                    try FileManager.default.createDirectory(at: colorset, withIntermediateDirectories: true, attributes: nil)
+                    try color.color.xcassetsData.data(using: .utf8)?.write(to: contents)
+                    print("Generate: \(colorset.path)")
+                } catch {
+                    print("[Error]: \(error.localizedDescription)")
+                }
+            }
+        } else {
+            var strings: [String] = []
+            strings.append(iOSSwiftFilePrefix)
+            
+            let structName = output.deletingPathExtension().lastPathComponent.escaped.capitalizedFirstLetter
+            let ext = iosStructSupportScheme ? ": ColorScheme" : ""
+            strings.append("public struct \(structName)\(ext) {")
+            for color in colors {
+                strings.append("\(indent)public let \(colorName(color)) = \(useExtendedSRGBColorspace ? color.color.colorspaceUIColor : color.color.uiColor)")
+            }
+            
+            strings.append("")
+            strings.append("\(indent)public init() {}")
+            strings.append("}")
+            
+            let text = strings.joined(separator: "\n")
+            try save(text: text, to: output)
         }
-
-        strings.append("")
-        strings.append("\(indent)public init() {}")
-        strings.append("}")
-
-        let text = strings.joined(separator: "\n")
-        try save(text: text, to: output)
     }
 
     func generateIOSSheme(output: URL) throws {

@@ -51,3 +51,13 @@ enum StyleType: String, Codable {
     case EFFECT
     case GRID
 }
+
+enum VariableType: String, Codable {
+    case COLOR
+    case STRING
+    case FLOAT
+}
+
+enum AliasType: String, Codable {
+    case VARIABLE_ALIAS
+}

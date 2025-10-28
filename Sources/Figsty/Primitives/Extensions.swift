@@ -105,28 +105,12 @@ extension Color {
     }
     
     var xcassetsData: String {
-        """
-        {
-          "colors" : [
-            {
-              "color" : {
-                "color-space" : "srgb",
-                "components" : {
-                  "alpha" : "\(a)",
-                  "blue" : "\(b.hexString)",
-                  "green" : "\(g.hexString)",
-                  "red" : "\(r.hexString)"
-                }
-              },
-              "idiom" : "universal"
-            }
-          ],
-          "info" : {
-            "author" : "xcode",
-            "version" : 1
-          }
-        }
-        """
+        let asset = XCAssetsColors(anyColor: self, lightColor: nil, darkColor: nil)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+        let data = try! encoder.encode(asset)
+        return String(data: data, encoding: .utf8)!
     }
 }
 
